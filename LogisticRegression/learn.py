@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import utils
 
 
-def plot_data(x_mat, y, decision_boundary):
+def plot_data(x_mat, y, db_x, db_y):
     plt.figure()
     plt.title('Data')
     admitted = (y == 1).flatten()
     rejected = (y == 0).flatten()
 
     # plot decision boundary
-    plt.plot([decision_boundary[0], decision_boundary[2]], [decision_boundary[1], decision_boundary[3]])
+    plt.plot(db_x, db_y)
 
     # plot admitted
     plt.scatter(x_mat[admitted, 0], x_mat[admitted, 1], color='blue', marker='+')
@@ -25,7 +25,7 @@ def plot_data(x_mat, y, decision_boundary):
 
 
 def main():
-    print('Loading and visualize dataset...')
+    print('Loading dataset...')
     # data is: exam 1 score, exam 2 score, bool whether admitted
     frame = pd.read_csv('ex2data1.csv', header=None)
     data = frame.values
@@ -42,8 +42,8 @@ def main():
 
     # Learn model
     print('starting to learn...')
-    (costs, theta) = utils.learn(x_norm, y, 5000, 0.1)
-    print('Final cost %s' % costs[-1])
+    (loss, reg_loss, theta) = utils.learn(x_norm, y, 5000, 0.1)
+    print('Final loss %s' % loss[-1])
     print('Final theta \n%s' % theta)
 
     # predict for student
@@ -68,19 +68,15 @@ def main():
     theta = theta.flatten()
 
     # calc 2 points on the line
-    min_x = np.min(x_norm[:, 1])
-    max_x = np.max(x_norm[:, 1])
-    y_min_x = -1 * (theta[0] / theta[2]) - (theta[1] / theta[2]) * min_x  # y value when x = min_x
-    y_max_x = -1 * (theta[0] / theta[2]) - (theta[1] / theta[2]) * max_x
+    plot_x = np.array([np.min(x_norm[:, 1]), np.max(x_norm[:, 1])])
+    plot_y = -1 * (theta[0] / theta[2]) - (theta[1] / theta[2]) * plot_x
 
     # denormalize the points
-    min_x = min_x * x_std[0] + x_mean[0]
-    max_x = max_x * x_std[0] + x_mean[0]
-    y_min_x = y_min_x * x_std[1] + x_mean[1]
-    y_max_x = y_max_x * x_std[1] + x_mean[1]
+    plot_x = plot_x * x_std[0] + x_mean[0]
+    plot_y = plot_y * x_std[1] + x_mean[1]
 
-    plot_data(x_mat, y, [min_x, y_min_x, max_x, y_max_x])
-    utils.plotLoss(costs)
+    plot_data(x_mat, y, plot_x, plot_y)
+    utils.plot_loss(loss)
 
     plt.show()
 
