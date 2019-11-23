@@ -9,18 +9,18 @@ def main():
     using random weights
     """
 
-    n = 500
+    nPerK = 500
 
     # create random data for 3 different classes (normally distributed numbers around some avg)
-    X1 = np.random.randn(n, 2) + [0, -2]
-    X2 = np.random.randn(n, 2) + [2, 2]
-    X3 = np.random.randn(n, 2) + [-2, 2]
+    XK1 = np.random.randn(nPerK, 2) + [0, -2]
+    XK2 = np.random.randn(nPerK, 2) + [2, 2]
+    XK3 = np.random.randn(nPerK, 2) + [-2, 2]
 
     # set the "actual" classes (0, 1, 2)
-    Y = np.array([0] * n + [1] * n + [2] * n)
+    Y = np.array([0] * nPerK + [1] * nPerK + [2] * nPerK)
 
     # join all classes to one dataset
-    X = np.vstack([X1, X2, X3])
+    X = np.vstack([XK1, XK2, XK3])
 
     D = X.shape[1]  # number of "features"
     K = 3  # number of classes
@@ -39,8 +39,8 @@ def main():
     print("Classification rate: %s" % class_rate)
 
     # by c=Y we assign each point in the scatter a colormap value of its class (Y)
-    plt.scatter(X[:, 0], X[:, 1], c=Y, alpha=0.5)
-    plt.show()
+    # plt.scatter(X[:, 0], X[:, 1], c=Y, alpha=0.5)
+    # plt.show()
 
 
 def forward(X, W1, b1, W2, b2):
@@ -49,19 +49,19 @@ def forward(X, W1, b1, W2, b2):
     :param X: Input dataset
     :param W1: Weights of first hidden layer
     :param b1: bias for first hidden layer
-    :param W2: weights for the output layer
+    :param W2: weights for the output layer (aka V)
     :param b2: bias for the output layer
     :return: Matrix with probabilities of each sample belong to each k (group)
     """
 
     # First hidden layer, each row has M values per each activation unit (will use sigmoid)
-    A1 = X.dot(W1) + b1
-    A1 = 1 / (1 + np.exp(-1 * A1))  # sigmoid
+    Z = X.dot(W1) + b1
+    Z = 1 / (1 + np.exp(-1 * Z))  # sigmoid
 
     # Second layer (output layer), each row has K values per each class prediction probability (we'll use softmax)
-    A2 = A1.dot(W2) + b2
-    expA2 = np.exp(A2)
-    Y = expA2 / expA2.sum(axis=1, keepdims=True)
+    A = Z.dot(W2) + b2
+    expA = np.exp(A)
+    Y = expA / expA.sum(axis=1, keepdims=True)
 
     return Y
 
